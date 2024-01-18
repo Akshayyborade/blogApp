@@ -2,6 +2,8 @@ package com.BlogApplication.services;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import com.BlogApplication.repository.UserRepo;
 public class UserServiceImpl implements UserServices {
 	@Autowired
 	UserRepo userRepo;
+	@Autowired
+	ModelMapper modelMapper;
 
 	@Override
 	public UserDto findByEmail(String email) {
@@ -48,7 +52,7 @@ public class UserServiceImpl implements UserServices {
 	@Override
 	public UserDto findById(int id) {
 		// TODO Auto-generated method stub
-		User byId = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException());
+		User byId = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
 		UserDto userDto = this.userToUserDto(byId);
 		return userDto;
 	}
@@ -60,32 +64,49 @@ public class UserServiceImpl implements UserServices {
 		userDto = this.userToUserDto(save);
 		return userDto;
 	}
-
+  // manually converted userdto to  user
+//	public User userdtoToUser(UserDto userDto) {
+//		User user = new User();
+//		user.setName(userDto.getName());
+//		user.setPassword(userDto.getPassword());
+//		user.setEmail(userDto.getEmail());
+//		user.setAbout(userDto.getAbout());
+//		return user;
+//	}
+    // manually coverted user to userdto
+//	public UserDto userToUserDto(User user) {
+//		UserDto userDto = new UserDto();
+//		userDto.setName(user.getName());
+//		userDto.setPassword(user.getPassword());
+//		userDto.setEmail(user.getEmail());
+//		userDto.setAbout(user.getAbout());
+//		return userDto;
+//
+//	}
+	//using Model mapping 
 	public User userdtoToUser(UserDto userDto) {
-		User user = new User();
-		user.setName(userDto.getName());
-		user.setPassword(userDto.getPassword());
-		user.setEmail(userDto.getEmail());
-		user.setAbout(userDto.getAbout());
+		User user = modelMapper.map(userDto, User.class);
 		return user;
 	}
-
+	//using Model mapping
 	public UserDto userToUserDto(User user) {
-		UserDto userDto = new UserDto();
-		userDto.setName(user.getName());
-		userDto.setPassword(user.getPassword());
-		userDto.setEmail(user.getEmail());
-		userDto.setAbout(user.getAbout());
+		UserDto userDto = modelMapper.map(user, UserDto.class);
 		return userDto;
 
 	}
 	public UserDto updateUser(UserDto updatedUser) {
 		User user = this.userdtoToUser(updatedUser);
 		User save = userRepo.save(user);
-		return this.userToUserDto(user);
+		return this.userToUserDto(save);
 	}
 	public void deleteUser(int id) {
-		userRepo.deleteById(id);
+		
+		try {
+			userRepo.deleteById(id);
+		} catch (ResourceNotFoundException e) {
+			e= new ResourceNotFoundException("user", "id", id);
+			// TODO: handle exception
+		}
 	}
 
 }
