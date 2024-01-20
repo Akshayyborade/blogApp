@@ -1,9 +1,7 @@
 package com.BlogApplication.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,10 +12,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.BlogApplication.dto.UserDto;
 import com.BlogApplication.payload.ApiResponse;
 import com.BlogApplication.services.UserServices;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,7 +26,7 @@ public class UserController {
 	UserServices userServices;
 
 	@PostMapping("/register")
-	public ResponseEntity<UserDto> creatUser(@RequestBody UserDto userDto) {
+	public ResponseEntity<UserDto> creatUser(@Valid @RequestBody UserDto userDto) {
 		UserDto saveUser = this.userServices.saveUser(userDto);
 		return new ResponseEntity<>(saveUser, HttpStatus.CREATED);
 	}
@@ -45,7 +44,7 @@ public class UserController {
 	}
 
 	@PutMapping("/updateUser")
-	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
+	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto) {
 		UserDto updateUser = userServices.updateUser(userDto);
 		return new ResponseEntity<>(updateUser, HttpStatus.OK);
 	}
